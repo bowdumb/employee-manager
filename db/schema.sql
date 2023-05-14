@@ -1,3 +1,4 @@
+-- This file contains the schematic structure of the database and it's tables.
 DROP DATABASE IF EXISTS employee_db;
 CREATE DATABASE employee_db;
 
@@ -23,5 +24,4 @@ CREATE TABLE employee (
     role_id INT,
     manager_id INT,
     FOREIGN KEY (role_id) REFERENCES role(id) ON DELETE SET NULL
-    -- FOREIGN KEY (manager_id) REFERENCES employee(id)
 );

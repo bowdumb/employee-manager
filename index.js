@@ -1,8 +1,11 @@
+// Enabling access to the necessary NPM packages as well as importing the exported array objects containing the Inquirer questions from inq-queries.js
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
-const { homeMenu, newDept, newRole, newEmp, updateRole} = require("./db/inq-queries");
 require('dotenv').config();
+const { homeMenu, newDept, newRole, newEmp } = require("./inq-queries");
 
+// Establishing connection between our database and MySQL while using the dotenv NPM package to obscure sensitive user information when publicly posting the
+// repository to GitHub.
 const database = mysql.createConnection({
     host: "127.0.0.1",
     user: process.env.DB_USER,
@@ -16,6 +19,9 @@ database.connect(function (err) {
     start();
 })
 
+//This start() function contains all of our JavaScript logic. Using a series of database queries we are able to manipulate the database using user input from the
+// Inquirer prompts that they will interact with through their terminal. After each feature is completed, the user is taken back to the home menu so that they can
+// select what they would like to do next. If the user chooses to exit the program, the Node.js process is terminated.
 const start = () => {
     inquirer.prompt(homeMenu)
         .then((answers) => {
@@ -53,36 +59,36 @@ const start = () => {
                             if (err) {
                                 console.log(err);
                             }
-                                console.log(answer.newDept + 'Has been created!');
+                            console.log(answer.newDept + 'Has been created!');
 
                             start();
                         });
                     });
             } else if (answers.home == "Add a role") {
                 inquirer.prompt(newRole)
-                .then((answer) => {
-                    database.query(`INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`, [answer.addRoleTitle, answer.addRoleSalary, answer.addRoleDept], (err, result) => {
-                        if (err) {
-                            console.log(err);
-                        }
-                        console.log(answer.addRoleTitle + " has been created!");
+                    .then((answer) => {
+                        database.query(`INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`, [answer.addRoleTitle, answer.addRoleSalary, answer.addRoleDept], (err, result) => {
+                            if (err) {
+                                console.log(err);
+                            }
+                            console.log(answer.addRoleTitle + " has been created!");
 
-                        start();
-                    })
-                });
-              
+                            start();
+                        })
+                    });
+
             } else if (answers.home == "Update employee role") {
                 database.query('SELECT id, CONCAT(first_name, " ", last_name) AS employee FROM employee', (err, employeeResult) => {
                     if (err) {
                         console.log(err);
                     }
-            
+
                     database.query('SELECT id, title FROM role', (err, roleResult) => {
                         if (err) {
                             console.log(err);
 
                         }
-            
+
                         inquirer.prompt([
                             {
                                 name: "selectEmployee",
@@ -101,7 +107,7 @@ const start = () => {
                             const selectedRoleTitle = answer.selectRole;
                             let selectedEmployeeId = employeeResult.find(obj => obj.employee === selectedEmployeeName).id;
                             let selectedRoleId = roleResult.find(obj => obj.title === selectedRoleTitle).id;
-            
+
                             database.query('UPDATE employee SET role_id = ? WHERE id = ?', [selectedRoleId, selectedEmployeeId], (err, result) => {
                                 if (err) {
                                     console.log(err);
@@ -115,80 +121,18 @@ const start = () => {
                 });
             } else if (answers.home == "Add an employee") {
                 inquirer.prompt(newEmp)
-                .then((answer) => {
-                    database.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, [answer.newEmpFirst, answer.newEmpLast, answer.newEmpRole, answer.newEmpMan], (err, result) => {
-                        if (err) {
-                            console.log(err);
-                        }
-                        console.log(answer.newEmpFirst + " " + answer.newEmpLast + " has been created and their role and manager have been assigned!");
+                    .then((answer) => {
+                        database.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, [answer.newEmpFirst, answer.newEmpLast, answer.newEmpRole, answer.newEmpMan], (err, result) => {
+                            if (err) {
+                                console.log(err);
+                            }
+                            console.log(answer.newEmpFirst + " " + answer.newEmpLast + " has been created and their role and manager have been assigned!");
+                        });
+                        start();
                     });
-                    start();
-                });
             } else if (answers.home == "Exit") {
                 process.exit();
             }
         }
-    )};
-            // }else if (answers.home == "Update employee role") {
-            //     database.query('SELECT id, CONCAT (first_name," ", last_name) AS employee FROM employee', (err, result) => {
-            //         console.log(result);
-            //         inquirer.prompt([{
-            //             name: "selectEmployee",
-            //             type: 'list',
-            //             choices: result.map(obj => obj.employee) // obj = {id:1, employee:"J C"}
-            //         }]).then(answer => {
-            
-            //             const selectedEmployeeName = answer.selectEmployee;
-            //             let selectedEmployeeId = result.filter(obj => obj.employee == selectedEmployeeName);
-            
-            //             selectedEmployeeId = selectedEmployeeId.length ? selectedEmployeeId[0].id : -1;
-
-                    
-            //             /**
-            //              * if(selectedEmployeeId.length>0) {
-            //              *  selectedEmployeeId = selectedEmployeeId[0].id; // {id:1, employee:"J C"}
-            //              * } else {
-            //              *  selectedEmployeeId = -1;
-            //              * }
-            //              */
-            
-            //             if (selectedEmployeeId == -1) {
-            //                 console.log("Error - The selected name doesn't match the database");
-            //             } else {
-            //                 console.log("The user selected employee ID:")
-            //                 console.log(selectedEmployeeId);
-            
-            //                 // TODO: Show role titles and convert back to role_id so you can update the employee's role_id
-            //                 database.query(`SELECT id, title FROM role`, (err, roleResult) => {
-            //                     if (err) {
-            //                         console.log(err);
-            //                     }
-            //                     inquirer.prompt([{
-            //                         name: 'selectRole',
-            //                         typpe: 'list',
-            //                         message: 'Which role would you like to assign to this employee?',
-            //                         choices: roleResult.map(obj=>obj.role)
-            //                     }]).then(answer => {
-            //                         const selectedRoleTitle = answer.selectRole;
-            //                         let selectedRoleId = roleResult.filter(obj=>obj.role == selectedRoleTitle);
-
-            //                         selectedRoleId = selectedRoleId.length ? selectedEmployeeId[0].id: -1;
-            //                     })
-
-            //                 })
-            //                 // const selectedRoletitle = answer.selectRoleId;
-            //                 // let 
-            
-            //                 // UPDATE employee SET role_id=? WHERE id=?, [selectedRoleId, selectedEmployeeId]
-            //             })
-            
-            
-                        // ..
-        //                 process.exit();
-        //             })
-        //         }
-        //     })
-        // };       
-   
-
-      
+        )
+};
