@@ -3,7 +3,7 @@ const homeMenu = [
         name: 'home',
         type: 'list',
         message: 'Please select one of the following options',
-        choices: ['View all departments', 'View all roles', 'View all emplpoyees', 'Add a department', 'Add a role', 'Add an employee', 'Update employee role']
+        choices: ['View all departments', 'View all roles', 'View all employees', 'Add a department', 'Add a role', 'Add an employee', 'Update employee role', 'Exit']
     }
 ];
 
@@ -11,7 +11,7 @@ const newDept = [
     {
         name: 'addDept',
         type: 'input',
-        message: 'What will the name of this new department be?'
+        message: 'What would you like the name of this new department to be?'
     }
 ];
 
@@ -29,7 +29,8 @@ const newRole = [
     {
         name: 'addRoleDept',
         type: 'input',
-        message: 'What department does this role exist within?'
+        message: 'What existing department (by department_id) contains this role?',
+        choices: ['1', '2', '3', '4', '5', '6','7', '8', '9', '10']
     }
 
 ];
