@@ -49,14 +49,14 @@ const newEmp = [
     {
         name: 'newEmpRole',
         type: 'list',
-        message: 'What role will this employee fulfill?',
-        choices: ['']
+        message: 'What role (by role_id) will this employee fulfill?',
+        choices: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
     },
     {
         name: 'newEmpMan',
         type: 'list',
-        message: 'Which manager will be this employees direct-report?',
-        choices: ['']
+        message: 'Which manager (by manager_id) will be this employees direct-report?',
+        choices: ['1', '2', '3', '4', '5', '6','7', '8', '9', '10']
     },
 ];
 
